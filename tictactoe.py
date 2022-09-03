@@ -38,7 +38,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_z and board.moveLog:
                     for _ in range(2 if game.gameMode=="AI" else 1):
-                        undo_row, undo_col = board.undo()
+                        undo_row, undo_col, _ = game.board.moveLog[-1]
+                        board.undo()
                         game.undo_X_O(undo_row, undo_col)
                         game.update_player()
                         game.running = True

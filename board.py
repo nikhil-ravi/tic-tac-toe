@@ -1,4 +1,4 @@
-import pygame
+from typing import Optional
 from constants import *
 import numpy as np
 
@@ -15,7 +15,14 @@ class Board:
         self.moveLog = []
         self.whereWin = [None, None, None, None]
 
-    def final_state(self):
+    def final_state(self) -> Optional[int]:
+        """Returns the winning player's ID if there is a win. In case of a draw,
+        returns 0.
+        
+        Returns:
+            Optional[int]: The winning player's ID if there is a win or 0 in case
+            of a draw. 
+        """
         if self.moveLog:
             row, col, player = self.moveLog[-1]
             toCheck = (self.rows[row], self.cols[col], self.diag, self.antidiag)
@@ -35,7 +42,15 @@ class Board:
         else:
             return None
 
-    def mark_square(self, row, col, player):
+    def mark_square(self, row: int, col: int, player: int):
+        """Update the state of the board upon a move. 
+
+        Args:
+            row (int): The row of the state to be updated.
+            col (int): The column of the state to be updated.
+            player (int): The player's ID which needs to be added to the state
+            at row and col.
+        """
         self.moveLog.append((row, col, player))
         self.squares[row, col] = player
         self.marked_squares += 1
@@ -47,6 +62,7 @@ class Board:
             self.antidiag += player
     
     def undo(self):
+        """Update the state of the board upon an undo."""
         row, col, player = self.moveLog.pop()
         self.squares[row, col] = 0
         self.marked_squares -= 1
@@ -56,16 +72,19 @@ class Board:
             self.diag -= player
         if row + col == ROWS - 1:
             self.antidiag -= player
-        return row, col
 
     def is_empty_square(self, row, col):
+        """Check if a square is empty."""
         return self.squares[row, col] == 0
 
     def is_full(self):
+        """Check if all the squares on the board have been filled."""
         return self.marked_squares == 9
 
     def is_empty(self):
+        """Check if none of the squares on the board have been filled."""
         return self.marked_squares == 0
 
     def get_empty_squares(self):
+        """Get the indices (row, col) of empty squares on the board."""
         return np.stack(np.where(self.squares == 0), axis=-1).tolist()
