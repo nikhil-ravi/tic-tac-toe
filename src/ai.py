@@ -42,8 +42,6 @@ class AI:
             tuple[int, Optional[tuple[int, int]]]
                 - int: The evaluation of the position. It is -1 when AI has a sure win, +1 when the player has a sure win and 0 otherwise.
                 - Optional[tuple[int,int]]: The row, col index of the best move.
-                
-                
         """
         case = board.final_state()
         if case == 1:

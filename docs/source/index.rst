@@ -6,6 +6,10 @@
 Welcome to Tic-Tac-Toe's documentation!
 =======================================
 
+This is the documentation page for the Tic-Tac-Toe game developed by following a
+YouTube `tutorial <https://www.youtube.com/watch?v=Bk9hlNZc6sE>`_ series by
+`Code Spot <https://www.youtube.com/channel/UCLqXQLK6zKZg0trhanjAkkQ>`_.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
