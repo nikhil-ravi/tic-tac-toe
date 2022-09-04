@@ -6,6 +6,13 @@ from board import Board
 
 
 class Game:
+    """Class to track the current games state and renderings.
+
+    Args:
+        pygame.Surface: The pygame surface to render the game board on.
+
+    """
+
     def __init__(self, screen: pygame.Surface):
         self.board = Board()
         self.ai = AI()

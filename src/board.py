@@ -4,6 +4,7 @@ import numpy as np
 
 
 class Board:
+    """Maintains the state of the board of the current game."""
     def __init__(self):
         self.squares = np.zeros((ROWS, COLS))
         self.empty_squares = self.squares
@@ -49,7 +50,7 @@ class Board:
             row (int): The row of the state to be updated.
             col (int): The column of the state to be updated.
             player (int): The player's ID which needs to be added to the state
-            at row and col.
+                at row and col.
         """
         self.moveLog.append((row, col, player))
         self.squares[row, col] = player

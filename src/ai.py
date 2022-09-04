@@ -6,7 +6,14 @@ from random import choice
 
 
 class AI:
-    def __init__(self, level=1, player=-1):
+    """The AI class to choose the best moves for the AI.
+    
+    Args:
+        level (int): The level of strength of the AI. 1 for minimax and 0 for random.
+        player (int): The player's ID. It is 1 for Player 1 and -1 for Player 2. 
+    
+    """
+    def __init__(self, level: int = 1, player: int = -1):
         self.level = level
         self.player = player
 
@@ -15,7 +22,8 @@ class AI:
 
         Returns:
             int: The row index of the chosen square.
-            int: The column index of the chosen square
+            int: The column index of the chosen square.
+            
         """
         empty_squares = board.get_empty_squares()
         return tuple(choice(empty_squares))
@@ -27,13 +35,15 @@ class AI:
 
         Args:
             board (Board): The board for which to find the best move.
-            maximizing (bool): Whether the AI is trying to maximize (when AI is
-            player 1) or minimize (when AI is player -1) the score.
+            maximizing (bool): Whether the AI is trying to maximize (when AI is 
+             player 1) or minimize (when AI is player -1) the score.
 
         Returns:
-            int: The evaluation of the position. It is -1 when AI has a sure win,
-            +1 when the player has a sure win and 0 otherwise.
-            Optional[tuple[int,int]]: The row, col index of the best move.
+            tuple[int, Optional[tuple[int, int]]]
+                - int: The evaluation of the position. It is -1 when AI has a sure win, +1 when the player has a sure win and 0 otherwise.
+                - Optional[tuple[int,int]]: The row, col index of the best move.
+                
+                
         """
         case = board.final_state()
         if case == 1:
