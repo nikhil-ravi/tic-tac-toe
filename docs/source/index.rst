@@ -10,11 +10,10 @@ Welcome to Tic-Tac-Toe's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   code
 
 Indices and tables
 ==================
 
-* :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
