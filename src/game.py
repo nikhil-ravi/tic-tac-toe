@@ -2,7 +2,7 @@ from typing import Optional
 import pygame
 from ai import AI
 from constants import *
-from board import Board
+from board import Board, Move
 
 
 class Game:
@@ -21,8 +21,14 @@ class Game:
         self.gameMode = "AI"  # "AI" or "PVP"
         self.running = True
         self.winLines = [
-            lambda x: ((20, (2 * x + 1) * SQSIZE // 2), (WIDTH - 20, (2 * x + 1) * SQSIZE // 2)),
-            lambda y: (((2 * y + 1) * SQSIZE // 2, 20), ((2 * y + 1) * SQSIZE // 2, HEIGHT - 20)),
+            lambda x: (
+                (20, (2 * x + 1) * SQSIZE // 2),
+                (WIDTH - 20, (2 * x + 1) * SQSIZE // 2),
+            ),
+            lambda y: (
+                ((2 * y + 1) * SQSIZE // 2, 20),
+                ((2 * y + 1) * SQSIZE // 2, HEIGHT - 20),
+            ),
             lambda x: ((20, 20), (WIDTH - 20, HEIGHT - 20)),
             lambda x: ((20, HEIGHT - 20), (WIDTH - 20, 20)),
         ]
@@ -33,74 +39,79 @@ class Game:
 
         self.screen.fill(BG_COLOR)
 
-        pygame.draw.line(self.screen, LINE_COLOR, (SQSIZE, 0), (SQSIZE, HEIGHT), LINE_WIDTH)
-        pygame.draw.line(self.screen, LINE_COLOR, (2 * SQSIZE, 0), (2 * SQSIZE, HEIGHT), LINE_WIDTH)
+        pygame.draw.line(
+            self.screen, LINE_COLOR, (SQSIZE, 0), (SQSIZE, HEIGHT), LINE_WIDTH
+        )
+        pygame.draw.line(
+            self.screen, LINE_COLOR, (2 * SQSIZE, 0), (2 * SQSIZE, HEIGHT), LINE_WIDTH
+        )
 
-        pygame.draw.line(self.screen, LINE_COLOR, (0, SQSIZE), (WIDTH, SQSIZE), LINE_WIDTH)
-        pygame.draw.line(self.screen, LINE_COLOR, (0, 2 * SQSIZE), (WIDTH, 2 * SQSIZE), LINE_WIDTH)
+        pygame.draw.line(
+            self.screen, LINE_COLOR, (0, SQSIZE), (WIDTH, SQSIZE), LINE_WIDTH
+        )
+        pygame.draw.line(
+            self.screen, LINE_COLOR, (0, 2 * SQSIZE), (WIDTH, 2 * SQSIZE), LINE_WIDTH
+        )
 
     def update_player(self):
         """Change the player once a move has been made."""
         self.player *= -1
 
-    def draw_X_O(self, row: int, col: int):
+    def draw_X_O(self, move: Move):
         """Draw either an X or an O depending on the player who made the current mark at row and col.
 
         Args:
-            row (int): The row of the box where the mark is to be drawn.
-            col (int): The column of the box where the mark is to be drawn.
+            move (Move): The move for which the mark is to be drawn.
         """
         if self.player == 1:
             pygame.draw.line(
                 self.screen,
                 CROSS_COLOR,
-                (col * SQSIZE + OFFSET, row * SQSIZE + OFFSET),
-                ((col + 1) * SQSIZE - OFFSET, (row + 1) * SQSIZE - OFFSET),
+                (move.col * SQSIZE + OFFSET, move.row * SQSIZE + OFFSET),
+                ((move.col + 1) * SQSIZE - OFFSET, (move.row + 1) * SQSIZE - OFFSET),
                 CROSS_WIDTH,
             )
             pygame.draw.line(
                 self.screen,
                 CROSS_COLOR,
-                ((col + 1) * SQSIZE - OFFSET, row * SQSIZE + OFFSET),
-                (col * SQSIZE + OFFSET, (row + 1) * SQSIZE - OFFSET),
+                ((move.col + 1) * SQSIZE - OFFSET, move.row * SQSIZE + OFFSET),
+                (move.col * SQSIZE + OFFSET, (move.row + 1) * SQSIZE - OFFSET),
                 CROSS_WIDTH,
             )
         elif self.player == -1:
             pygame.draw.circle(
                 self.screen,
                 CIRCLE_COLOR,
-                ((2 * col + 1) * SQSIZE / 2, (2 * row + 1) * SQSIZE / 2),
+                ((2 * move.col + 1) * SQSIZE / 2, (2 * move.row + 1) * SQSIZE / 2),
                 CIRCLE_RADIUS,
                 CIRCLE_WIDTH,
             )
 
-    def undo_X_O(self, row: int, col: int):
+    def undo_X_O(self, move: Move):
         """Undo the previous marking.
 
         Args:
-            row (int): The row of the box where the mark is to be drawn.
-            col (int): The column of the box where the mark is to be drawn.
+            move (Move): The move to undo.
         """
         pygame.draw.rect(
             self.screen,
             BG_COLOR,
             pygame.Rect(
-                col * SQSIZE + OFFSET / 2,
-                row * SQSIZE + OFFSET / 2,
+                move.col * SQSIZE + OFFSET / 2,
+                move.row * SQSIZE + OFFSET / 2,
                 SQSIZE - OFFSET,
                 SQSIZE - OFFSET,
             ),
         )
 
-    def make_move(self, row: int, col: int):
+    def make_move(self, move: Move):
         """Make a move.
 
         Args:
-            row (int): The row of the box where the mark is to be drawn.
-            col (int): The column of the box where the mark is to be drawn.
+            row (int): The move for which the mark is to be drawn.
         """
-        self.board.mark_square(row, col, self.player)
-        self.draw_X_O(row, col)
+        self.board.mark_move(move, self.player)
+        self.draw_X_O(move)
         self.update_player()
 
     def change_gamemode(self):
@@ -126,6 +137,22 @@ class Game:
         """Draw a line along the winning row (or column or diagonal) once the
         game is over."""
         color = CIRCLE_COLOR if status == -1 else CROSS_COLOR
-        for i, x in enumerate(self.board.whereWin):
-            if x is not None:
-                pygame.draw.line(self.screen, color, *self.winLines[i](x), LINE_WIDTH)
+        if self.board.whereWin:
+            if self.board.whereWin <= 5:
+                x = self.board.whereWin % 3
+            else:
+                x = 0
+            if self.board.whereWin <= 2:
+                y = 0
+            elif 3 <= self.board.whereWin <= 5:
+                y = 1
+            elif self.board.whereWin == 6:
+                y = 2
+            else:
+                y = 3
+            pygame.draw.line(
+                self.screen,
+                color,
+                *self.winLines[y](x),
+                LINE_WIDTH
+            )
